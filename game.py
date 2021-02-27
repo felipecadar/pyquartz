@@ -1,4 +1,5 @@
 import random
+from functools import reduce
 
 color = {
     0:"azul",
@@ -58,7 +59,7 @@ class Deck:
     def give(self, n):
         if n > len(self.deck):
             return []
-            
+
         return [self.deck.pop() for x in range(n)]
 
 class Player:
@@ -75,7 +76,12 @@ class Player:
         self.chest = [None, None]
 
     def sell(self):
-        pass
+        
+        all_values = [0] * (len(gems_config)-1)
+        for gem in self.gems:
+            all_values[gem] += gems_config[gem][2]
+            
+        return reduce(lambda x1, x2: x1 + x2 , all_values)
 
     def mine(self, mine):
         pass

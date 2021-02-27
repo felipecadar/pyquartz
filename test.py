@@ -13,6 +13,10 @@ class TestPlayer(unittest.TestCase):
     def test_sell(self):
         self.player1.gems = [0,0,0]
         self.assertEqual(self.player1.sell(), 3)
+
+    def test_sell_combo(self):
+        self.player1.gems = [0,0,0, 1]
+        self.assertEqual(self.player1.sell(), 7)
         
 
 class TestDeck(unittest.TestCase):
