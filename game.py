@@ -1,6 +1,7 @@
 import random
 import numpy as np
 from functools import reduce
+import random
 
 color = {
     0:"azul",
@@ -8,17 +9,17 @@ color = {
 }
 
 cards_config = {
-    0: { 'name': "Agora vai...", 'qty':10, 'color':0},
-    1: { 'name': "Rá, EUREKA!", 'qty':3, 'color':0},
-    2: { 'name': "chega mais...", 'qty':3, 'color':0},
-    3: { 'name': "sai da frenteeee...", 'qty':3, 'color':0},
-    4: { 'name': "Cristal? que Cristal?", 'qty':3, 'color':0},
-    5: { 'name': "me faz um favor...", 'qty':8, 'color':0},
-    6: { 'name': "não te pertence mais...", 'qty':8, 'color':0},
-    7: { 'name': "opa! esse Cristal não é meu...", 'qty':8, 'color':0},
-    8: { 'name': "nem meu!", 'qty':3, 'color':1},
-    9: { 'name': "só por cima do meu cadáver!", 'qty':3, 'color':1},
-    1: { 'name': "estou cansado...", 'qty':3, 'color':1},
+    0: { 'name': "Agora vai...", 'qty':10, 'color':0, 'value':4},
+    1: { 'name': "Rá, EUREKA!", 'qty':3, 'color':0, 'value':4},
+    2: { 'name': "chega mais...", 'qty':3, 'color':0, 'value':4},
+    3: { 'name': "sai da frenteeee...", 'qty':3, 'color':0, 'value':4},
+    4: { 'name': "Cristal? que Cristal?", 'qty':3, 'color':0, 'value':4},
+    5: { 'name': "me faz um favor...", 'qty':8, 'color':0, 'value':4},
+    6: { 'name': "não te pertence mais...", 'qty':8, 'color':0, 'value':4},
+    7: { 'name': "opa! esse Cristal não é meu...", 'qty':8, 'color':0, 'value':4},
+    8: { 'name': "nem meu!", 'qty':3, 'color':1, 'value':4},
+    9: { 'name': "só por cima do meu cadáver!", 'qty':3, 'color':1, 'value':4},
+    1: { 'name': "estou cansado...", 'qty':3, 'color':1, 'value':4},
 }
 
 gems_config = {
@@ -36,6 +37,7 @@ class Card:
         self.card_id = card_id
         self.color = cards_config[card_id]['color']
         self.name = cards_config[card_id]['name']
+        self.value = cards_config[card_id]['value']
 
     def run(self):
         pass
@@ -57,11 +59,11 @@ class Deck:
         random.shuffle(deck)
         self.deck = deck
 
-    def give(self, n):
-        if n > len(self.deck):
-            return []
-
-        return [self.deck.pop() for x in range(n)]
+    def give(self):
+        if len(self.deck) == 0:
+            raise Exception("Empty Deck!")
+    
+        return self.deck.pop()
 
 class Player:
     def __init__(self, pid, name=None):
@@ -75,6 +77,14 @@ class Player:
         self.couins = 0
         self.protection = False
         self.chest = [None, None]
+
+    def sellCards(self):
+        cards_values = [i.value for i in self.cards]
+
+    def buyCard(self, deck:Deck):
+        card = deck.give()
+        self.cards.append(card)
+
 
     def sell(self):
         
@@ -155,7 +165,7 @@ class Player:
         return np.max(all_combos)    
 
     def mine(self, mine):
-        pass
+        self.gems.append(mine.getGem())
 
     def useCard(self):
         pass
@@ -169,12 +179,17 @@ class Mine:
         self.makeMine()
 
     def makeMine(self):
-        mine = []
         for gid in gems_config:
             name, qty, value = gems_config[gid]
             for i in range(qty):
-                mine.append(gid)
+                self.gems.append(gid)
 
+    def shuffleMine(self):
+        random.shuffle(self.gems)
+
+    def getGem(self):
+        self.shuffleMine()
+        return self.gems.pop()
 
 if __name__ == "__main__":
    player1 = Player(1)

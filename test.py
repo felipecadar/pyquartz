@@ -37,14 +37,25 @@ class TestDeck(unittest.TestCase):
         self.deck = game.Deck()
         
     def test_give(self):
-        cards = self.deck.give(5)
+        cards = [self.deck.give() for i in range(5)]
         self.assertEqual(len(cards), 5) 
 
-    def test_give_too_much(self):
-        cards = self.deck.give(500)
-        self.assertEqual(len(cards), 0) 
+class TestRound(unittest.TestCase):
+    def setUp(self):
+        self.mine = game.Mine()
+        self.deck = game.Deck()
+        self.player1 = game.Player(1)
+        self.player2 = game.Player(2)
+    
+    def test_mine(self):
+        self.player1.mine(self.mine)
+        self.player1.mine(self.mine)
+        assert(len(self.player1.gems) == 2)
 
-
+    def test_init_cards(self):
+        for i in range(5):
+            self.player1.buyCard(self.deck)
+        assert(len(self.player1.cards) == 5)
 
 
 
