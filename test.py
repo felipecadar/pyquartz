@@ -11,12 +11,24 @@ class TestPlayer(unittest.TestCase):
         self.assertEqual(self.player1.pid, 1) 
 
     def test_sell(self):
-        self.player1.gems = [0,0,0]
-        self.assertEqual(self.player1.sell(), 3)
+        self.player1.gems = [0,1,2]
+        self.assertEqual(self.player1.sell(), 6)
 
-    def test_sell_combo(self):
+    def test_sell_combo1(self):
         self.player1.gems = [0,0,0, 1]
         self.assertEqual(self.player1.sell(), 7)
+
+    def test_sell_combo2(self):
+        self.player1.gems = [0,0,0,0, 1, 2]
+        self.assertEqual(self.player1.sell(), 14)
+
+    def test_sell_combo3(self):
+        self.player1.gems = [0,1,2,3,4]
+        self.assertEqual(self.player1.sell(), 24)
+
+    def test_sell_combo4(self):
+        self.player1.gems = [0,1,2,3,4,5]
+        self.assertEqual(self.player1.sell(), 36)
         
 
 class TestDeck(unittest.TestCase):

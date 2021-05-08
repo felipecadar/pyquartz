@@ -1,4 +1,5 @@
 import random
+import numpy as np
 from functools import reduce
 
 color = {
@@ -23,11 +24,11 @@ cards_config = {
 gems_config = {
     0: ("Quartzo", 15, 1),
     1: ("Rubelita", 12, 2),
-    3: ("Esmeralda", 10, 3),
-    4: ("Safira", 7, 4),
-    5: ("Rubi", 4, 6),
-    6: ("Ambar", 2, 8),
-    7: ("Autunita", 18, 0),
+    2: ("Esmeralda", 10, 3),
+    3: ("Safira", 7, 4),
+    4: ("Rubi", 4, 6),
+    5: ("Ambar", 2, 8),
+    6: ("Autunita", 18, 0),
 }
 
 class Card:
@@ -77,11 +78,81 @@ class Player:
 
     def sell(self):
         
-        all_values = [0] * (len(gems_config)-1)
+        gem_count = [0] * (len(gems_config)-1)
         for gem in self.gems:
-            all_values[gem] += gems_config[gem][2]
-            
-        return reduce(lambda x1, x2: x1 + x2 , all_values)
+            gem_count[gem] += 1
+
+        gems_values = [gems_config[i][2] for i in self.gems]
+        value = reduce(lambda x, y: x+y, gems_values)
+        combo_value = value
+        
+        all_combos = [value]
+
+        # test each combo
+        # Sell x3
+        has_combo = False
+        combo_gem = -1
+        for i, c in enumerate(gem_count):
+            if c >= 3:
+                has_combo = True
+                combo_gem = i 
+                break
+
+
+        if has_combo:
+            combo_value = value
+            m = -1
+            idx = -1
+            for i, ci in enumerate(gem_count):
+                if i != combo_gem and ci > 0:
+                    combo_value = value + (ci * gems_config[i][2]) 
+                    if combo_value > m:
+                        idx = i
+                        m = combo_value
+            if m > combo_value:
+                combo_value = m
+
+            all_combos.append(combo_value)
+
+        # Sell x4
+        has_combo = False
+        combo_gem = -1
+        for i, c in enumerate(gem_count):
+            if c >= 4:
+                has_combo = True
+                combo_gem = i 
+                break
+
+        gems_values = [gems_config[i][2] for i in self.gems]
+        value = reduce(lambda x, y: x+y, gems_values)
+
+        if has_combo:
+            combo_value = value
+            m = -1
+            idx = -1
+            for i, ci in enumerate(gem_count):
+                if i != combo_gem and ci > 0:
+                    for j, cj in enumerate(gem_count):
+                        if i!=j and j != combo_gem and cj > 0:
+                            combo_value = value + (ci * gems_config[i][2]) + (cj * gems_config[j][2]) 
+                            if combo_value > m:
+                                idx = i
+                                m = combo_value
+            if m > combo_value:
+                combo_value = m
+            all_combos.append(combo_value)
+
+        # Sell 5!=
+        if 0 in self.gems and 1 in self.gems and 2 in self.gems and 3 in self.gems and 4 in self.gems:
+            combo_value = value + 8
+            all_combos.append(combo_value)
+
+        # Sell 6!=
+        if 0 in self.gems and 1 in self.gems and 2 in self.gems and 3 in self.gems and 4 in self.gems and 5 in self.gems:
+            combo_value = value + 12
+            all_combos.append(combo_value)
+
+        return np.max(all_combos)    
 
     def mine(self, mine):
         pass
@@ -103,3 +174,10 @@ class Mine:
             name, qty, value = gems_config[gid]
             for i in range(qty):
                 mine.append(gid)
+
+
+if __name__ == "__main__":
+   player1 = Player(1)
+   player1.gems = [0,0,0, 1]
+   v = player1.sell()   
+   print(v)
